@@ -88,6 +88,7 @@ class UserController extends AbstractActionController
             return array(
                 'loginForm' => $form,
                 'redirect'  => $redirect,
+            	'sourceRouteLogin' => $this->params('sourceRouteLogin'),
                 'enableRegistration' => $this->getOptions()->getEnableRegistration(),
             );
         }
@@ -96,7 +97,8 @@ class UserController extends AbstractActionController
 
         if (!$form->isValid()) {
             $this->flashMessenger()->setNamespace('zfcuser-login-form')->addMessage($this->failedLoginMessage);
-            return $this->redirect()->toUrl($this->url()->fromRoute(static::ROUTE_LOGIN).($redirect ? '?redirect='. rawurlencode($redirect) : ''));
+//             return $this->redirect()->toUrl($this->url()->fromRoute(static::ROUTE_LOGIN).($redirect ? '?redirect='.$redirect : ''));
+            return $this->redirect()->toUrl($this->url()->fromRoute($request->getPost()['sourceRouteLogin']).($redirect ? '?redirect='.$redirect : ''));
         }
 
         // clear adapters

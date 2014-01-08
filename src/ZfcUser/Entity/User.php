@@ -2,7 +2,9 @@
 
 namespace ZfcUser\Entity;
 
-class User implements UserInterface
+use ZfcRbac\Identity\IdentityInterface;
+
+class User implements UserInterface, IdentityInterface
 {
     /**
      * @var int
@@ -164,5 +166,28 @@ class User implements UserInterface
     {
         $this->state = $state;
         return $this;
+    }
+    
+    /**
+     * @see \ZfcRbac\Identity\IdentityInterface::getRoles()
+     */
+    public function getRoles() {
+    	$link = mysql_connect('localhost', 'root', 'root');
+    	if (!$link) {
+    		die('Could not connect: ' . mysql_error());
+    	}
+    	
+    	$db = 'tsv';
+    	$query = 'SELECT rr.role_name FROM '.$db.'.user_role ur INNER JOIN '.$db.'.rbac_role rr ON ur.role_id = rr.role_id WHERE ur.user_id = ' . $this->id;
+    	$result = mysql_query($query);
+
+    	$roles = array();
+    	while ($row = mysql_fetch_assoc($result)) {
+    		$roles[] = $row['role_name'];
+    	}
+    	
+    	mysql_close($link);
+//     	var_dump($roles);
+    	return $roles;
     }
 }
